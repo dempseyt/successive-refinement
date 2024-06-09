@@ -168,7 +168,7 @@ public class Args {
     }
 
     private void setBooleanArg(char argChar, boolean value) {
-        booleanArgs.get(argChar).setBoolean(value)
+        booleanArgs.get(argChar).set("true");
     }
 
     private boolean isBooleanArg(char argChar) {
@@ -235,7 +235,7 @@ public class Args {
 
     public boolean getBoolean(char arg) {
         Args.ArgumentMarshaler am = booleanArgs.get(arg);
-        return am != null && am.getBoolean();
+        return am != null && (boolean)am.get();
     }
 
     public boolean has(char arg) {
@@ -250,17 +250,10 @@ public class Args {
     }
 }
 
-private class ArgumentMarshaler {
-    private boolean booleanValue = false;
+private abstract class ArgumentMarshaler {
     private String stringValue;
     private int integerValue;
-
-    public void setBoolean(boolean value) {
-        booleanValue = value;
-    }
-
-    public boolean getBoolean() {return booleanValue;}
-
+    
     public void setString(String s) {
         stringValue = s;
     }
@@ -277,7 +270,21 @@ private class ArgumentMarshaler {
         return integerValue;
     }
 
+    public abstract void set(String s);
+
+    public abstract Object get() {
+        return null;
+    }
+    
     private class BooleanArgumentMarshaler extends ArgumentMarshaler {
+        private boolean booleanValue = false;
+        public void set(String s) {
+            booleanValue = true;
+        }
+
+        public Object get() {
+            return booleanValue;
+        }
     }
 
     private class StringArgumentMarshaler extends ArgumentMarshaler {
