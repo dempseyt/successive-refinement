@@ -126,23 +126,30 @@ public class Args {
 
     private boolean setArgument(char argChar) throws ArgsException {
         ArgumentMarshaler m = marshalers.get(argChar);
-        if (m instanceof BooleanArgumentMarshaler)
+        try {
+
+            if (m instanceof BooleanArgumentMarshaler)
             setBooleanArg(m);
-        else if (m instanceof StringArgumentMarshaler)
-            setStringArg(m);
-        else if (m instanceof IntegerArgumentMarshaler)
-            setIntArg(m);
-        else
+            else if (m instanceof StringArgumentMarshaler)
+            setStringArg(m);;
+            else if (m instanceof IntegerArgumentMarshaler)
+            setIntArg(m);;
+            else
             return false;
+        } catch (ArgsException e) {
+            valid = false;
+            errorArgumentId = argChar;
+            throw e;
+        }
         return true;
     }
 
-    private void setIntArg(char argChar) throws ArgsException {
+    private void setIntArg(ArgumentMarshaler m) throws ArgsException {
         currentArgument++;
         String parameter = null;
         try {
             parameter = args[currentArgument];
-            intArgs.get(argChar).set(Integer.parseInt(parameter));
+            m.set(parameter);
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -157,10 +164,10 @@ public class Args {
         }
     }
 
-    private void setStringArg(char argChar) throws ArgsException {
+    private void setStringArg(ArgumentMarshaler m) throws ArgsException {
         currentArgument++;
         try {
-            stringArgs.get(argChar).set(args[currentArgument]);
+            m.set(args[currentArgument]);
         } catch (ArrayIndexOutOfBoundsException e) {
             valid = false;
             errorArgumentId = argChar;
@@ -169,9 +176,9 @@ public class Args {
         }
     }
 
-    private void setBooleanArg(char argChar, boolean value) {
+    private void setBooleanArg(ArgumentMarshaler m) {
         try {
-            booleanArgs.get(argChar).set("true");
+            m.set("true");
         } catch (ArgsException e) {}
     }
 
